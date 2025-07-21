@@ -1,0 +1,39 @@
+#!/bin/bash
+# alpinest: rootless Alpine environment similar to Junest
+
+set -e
+
+ALPINE_DIR="$HOME/.alpine"
+ALPINE_URL="https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64"
+MINIROOTFS=$(curl -s "$ALPINE_URL/" | grep -oE 'alpine-minirootfs-[0-9.]+-x86_64\.tar\.gz' | sort -V | tail -n1)
+
+# Download and prepare the environment if it doesn't exist
+if [ ! -d "$ALPINE_DIR" ]; then
+    echo "[+] Creating Alpine environment in $ALPINE_DIR"
+    mkdir -p "$ALPINE_DIR"
+    wget "$ALPINE_URL/$MINIROOTFS" -O /tmp/alpine.tar.gz
+    tar -xzf /tmp/alpine.tar.gz -C "$ALPINE_DIR"
+    rm /tmp/alpine.tar.gz
+    echo "nameserver 1.1.1.1" > "$ALPINE_DIR/etc/resolv.conf"
+fi
+
+# Function to launch a shell inside Alpine
+run_shell() {
+    exec proot -R "$ALPINE_DIR" \
+        -b /dev -b /proc -b /sys -b /tmp \
+        -b "$HOME:/home/user" \
+        -b "$(pwd):$(pwd)" -w "$(pwd)" \
+        /bin/sh
+}
+
+# If `run` is the first argument, execute the command inside Alpine
+if [ "$1" = "run" ]; then
+    shift
+    proot -R "$ALPINE_DIR" \
+        -b /dev -b /proc -b /sys -b /tmp \
+        -b "$HOME:/home/user" \
+        -b "$(pwd):$(pwd)" -w "$(pwd)" \
+        /bin/sh -c "$*"
+else
+    run_shell
+fi
