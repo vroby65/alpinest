@@ -15,6 +15,8 @@ if [ ! -d "$ALPINE_DIR" ]; then
     tar -xzf /tmp/alpine.tar.gz -C "$ALPINE_DIR"
     rm /tmp/alpine.tar.gz
     echo "nameserver 1.1.1.1" > "$ALPINE_DIR/etc/resolv.conf"
+    echo 'export TERM=xterm-256color' >> ~/.profile
+
 fi
 
 # Function to launch a shell inside Alpine
