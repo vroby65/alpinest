@@ -3,7 +3,7 @@
 
 set -e
 
-ALPINE_DIR="$HOME/.alpine"
+ALPINE_DIR="$HOME/.alpinest"
 ALPINE_URL="https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64"
 MINIROOTFS=$(curl -s "$ALPINE_URL/" | grep -oE 'alpine-minirootfs-[0-9.]+-x86_64\.tar\.gz' | sort -V | tail -n1)
 
