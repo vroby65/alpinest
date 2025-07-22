@@ -60,8 +60,6 @@ You can use alpinest to run a single command directly inside the Alpine environm
 
 Examples:
 ```bash
-Copia
-Modifica
 alpinest micro
 alpinest make build
 alpinest bash -c 'echo Hello from Alpine!'
