@@ -33,7 +33,7 @@ Make sure `/usr/local/bin` is in your `$PATH`.
 
 - Linux
 - `proot`
-- `curl` or `wget`
+- `curl` 
 - `tar`
 
 ## 📦 Usage
@@ -55,6 +55,22 @@ Exit the environment:
 ```sh
 exit
 ```
+## ⚙️ Running Commands Without a Shell
+You can use alpinest to run a single command directly inside the Alpine environment without launching an interactive shell.
+
+Examples:
+```bash
+Copia
+Modifica
+alpinest micro
+alpinest make build
+alpinest bash -c 'echo Hello from Alpine!'
+```
+
+This works similarly to docker run or chroot: the command is executed inside Alpine with your current directory mounted and used as working directory.
+
+If no arguments are given, alpinest will start an interactive shell instead.
+
 
 ## 🔒 Security
 

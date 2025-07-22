@@ -7,16 +7,14 @@ ALPINE_DIR="$HOME/.alpinest"
 ALPINE_URL="https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64"
 MINIROOTFS=$(curl -s "$ALPINE_URL/" | grep -oE 'alpine-minirootfs-[0-9.]+-x86_64\.tar\.gz' | sort -V | tail -n1)
 
-# Download and prepare the environment if it doesn't exist
 if [ ! -d "$ALPINE_DIR" ]; then
     echo "[+] Creating Alpine environment in $ALPINE_DIR"
     mkdir -p "$ALPINE_DIR"
-    wget "$ALPINE_URL/$MINIROOTFS" -O /tmp/alpine.tar.gz
+    curl -L "$ALPINE_URL/$MINIROOTFS" -o /tmp/alpine.tar.gz
     tar -xzf /tmp/alpine.tar.gz -C "$ALPINE_DIR"
     rm /tmp/alpine.tar.gz
     echo "nameserver 1.1.1.1" > "$ALPINE_DIR/etc/resolv.conf"
     echo 'export TERM=xterm-256color' >> ~/.profile
-
 fi
 
 # Function to launch a shell inside Alpine
@@ -28,9 +26,24 @@ run_shell() {
         /bin/sh
 }
 
-# If `run` is the first argument, execute the command inside Alpine
-if [ "$1" = "run" ]; then
-    shift
+# If arguments are provided, execute the command inside Alpine
+show_help() {
+    cat <<EOF
+Usage: alpinest [COMMAND [ARGS...]]
+       alpinest          # starts an interactive shell inside Alpine
+       alpinest --help   # shows this help message
+
+Examples:
+  alpinest micro             # runs 'micro' inside Alpine
+  alpinest make build        # runs 'make build' inside Alpine
+  alpinest                   # starts a shell inside Alpine
+EOF
+}
+
+if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    show_help
+    exit 0
+elif [ $# -gt 0 ]; then
     proot -R "$ALPINE_DIR" \
         -b /dev -b /proc -b /sys -b /tmp \
         -b "$HOME:/home/user" \
@@ -39,3 +52,4 @@ if [ "$1" = "run" ]; then
 else
     run_shell
 fi
+
