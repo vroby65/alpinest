@@ -63,7 +63,7 @@ exit
 ## 📁 Directory Structure
 
 - `alpinest` — main launcher script
-- `alpine/` — contains the downloaded Alpine Linux system
+- `.alpinest/` — contains the downloaded Alpine Linux system
 - `etc/`, `tmp/` — optional local customizations
 
 ## 🧪 Use Cases
@@ -71,6 +71,26 @@ exit
 - Quickly test scripts or binaries in a clean Alpine environment
 - Build `.apk` packages without Docker or VMs
 - Try Alpine without affecting your main OS
+
+`alpinest` provides a minimal Alpine-based environment designed for running CLI and GUI applications in a rootless sandbox using `bubblewrap`. It is ideal for:
+
+- Running isolated command-line tools
+- Testing graphical applications without polluting the host
+- Building or compiling software in a clean Alpine base
+- Scripting automated workflows with persistent storage
+
+**Note:** To run graphical applications properly, you must install fonts. For example:
+
+```sh
+alpinest apk add fontconfig ttf-dejavu
+```
+
+## ⚠️ Warning
+
+Currently, **Chromium** and **Firefox** do not work inside `alpinest` due to limitations of `proot`, which prevent proper sandboxing and shared memory access required by these browsers.
+
+As a result, attempting to launch them will likely result in crashes or unexpected behavior.
+
 
 ## 📄 License
 
