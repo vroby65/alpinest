@@ -3,9 +3,24 @@
 
 set -e
 
+# Detect host architecture and map to Alpine release subdir
+ARCH=$(uname -m)
+case "$ARCH" in
+    x86_64)      ARCH_ID="x86_64" ;;
+    i686|i386)   ARCH_ID="x86" ;;
+    aarch64)     ARCH_ID="aarch64" ;;
+    armv7l)      ARCH_ID="armv7" ;;
+    armhf)       ARCH_ID="armhf" ;;  # rarely returned by uname -m
+    loongarch64) ARCH_ID="loongarch64" ;;
+    ppc64le)     ARCH_ID="ppc64le" ;;
+    riscv64)     ARCH_ID="riscv64" ;;
+    s390x)       ARCH_ID="s390x" ;;
+    *) echo "Unsupported architecture: $ARCH" >&2; exit 1 ;;
+esac
+
 ALPINE_DIR="$HOME/.alpinest"
-ALPINE_URL="https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64"
-MINIROOTFS=$(curl -s "$ALPINE_URL/" | grep -oE 'alpine-minirootfs-[0-9.]+-x86_64\.tar\.gz' | sort -V | tail -n1)
+ALPINE_URL="https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/$ARCH_ID"
+MINIROOTFS=$(curl -s "$ALPINE_URL/" | grep -oE 'alpine-minirootfs-[0-9.]+-'$ARCH_ID'\.tar\.gz' | sort -V | tail -n1)
 
 if [ ! -d "$ALPINE_DIR" ]; then
     echo "[+] Creating Alpine environment in $ALPINE_DIR"
@@ -26,7 +41,7 @@ run_shell() {
         /bin/sh
 }
 
-# If arguments are provided, execute the command inside Alpine
+# Help text
 show_help() {
     cat <<EOF
 Usage: alpinest [COMMAND [ARGS...]]
@@ -40,6 +55,7 @@ Examples:
 EOF
 }
 
+# Main logic
 if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
     show_help
     exit 0
@@ -52,4 +68,3 @@ elif [ $# -gt 0 ]; then
 else
     run_shell
 fi
-
